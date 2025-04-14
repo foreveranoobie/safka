@@ -1,0 +1,95 @@
+doctype html
+html(lang='en')
+head
+  title Topics Page
+  style.
+    body {
+      font-family: sans-serif;
+      background-color: #D2B48C;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .container {
+      background-color: #A8785C;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      width: 400px;
+    }
+    .tabs {
+      display: flex;
+      justify-content: space-around;
+      margin-bottom: 20px;
+    }
+    .tab {
+      padding: 10px 20px;
+      border: none;
+      background-color: #F5E0CA;
+      color: #A8785C;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    .tab:hover {
+      background-color: #E6CCB2;
+    }
+    .tab.active {
+      background-color: #A8785C;
+      color: #F5E0CA;
+    }
+    .topic-list {
+      max-height: 200px;
+      overflow-y: auto;
+      border: 1px solid #A8785C;
+      padding: 10px;
+      background-color: #F5E0CA;
+      border-radius: 5px;
+    }
+    .topic-item {
+      padding: 5px 0;
+      color: #A8785C;
+      cursor: pointer; /* Make the topics clickable */
+      border-bottom: 1px solid #A8785C; /* Add a separator line */
+    }
+    .topic-item:last-child {
+      border-bottom: none; /* Remove separator from the last item */
+    }
+
+
+body
+  .container
+    .tabs
+      button.tab.active Topics
+      button.tab Consumers
+      button.tab Producers
+
+    .topic-list
+      if topics && topics.length > 0
+        each topic in topics
+          .topic-item(onclick=`handleTopicClick("${topic}")`)= topic
+      else
+        .topic-item No topics found.
+
+  script.
+    function handleTopicClick(topic) {
+      // Send request to backend here
+      console.log("Clicked on topic:", topic);
+
+      // Example using fetch API (replace with your actual backend endpoint)
+      fetch('/api/topicDetails?topic=' + topic) // Send topic as query parameter
+        .then(response => response.json())
+        .then(data => {
+          console.log("Response from backend:", data);
+          // Update UI with topic details (e.g., in the grey box area)
+          const detailsArea = document.getElementById('topic-details');
+          if (detailsArea) {
+            detailsArea.innerHTML = JSON.stringify(data, null, 2); // Display data in the details area
+          }
+        })
+        .catch(error => {
+          console.error("Error fetching topic details:", error);
+        });
+    }

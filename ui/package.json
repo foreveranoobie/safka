@@ -1,0 +1,16 @@
+{
+  "name": "safka-ui",
+  "version": "1.0.0",
+  "description": "UI for Safka messaging broker",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "alexstk",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.21.2",
+    "net": "^1.0.2",
+    "pug": "^3.0.3"
+  }
+}
