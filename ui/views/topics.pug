@@ -18,11 +18,28 @@ head
       border-radius: 10px;
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
       width: 400px;
+      margin-left: 140px;
     }
     .tabs {
       display: flex;
       justify-content: space-around;
       margin-bottom: 20px;
+    }
+    button {
+      padding: 10px 20px;
+      border: none;
+      background-color: #F5E0CA;
+      color: #A8785C;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    button:hover{
+      background-color: #E6CCB2;
+    }
+    button.active {
+      background-color: #A8785C;
+      color: #F5E0CA;
     }
     .tab {
       padding: 10px 20px;
@@ -47,6 +64,7 @@ head
       padding: 10px;
       background-color: #F5E0CA;
       border-radius: 5px;
+      scrollbar-color:#A8785C #F5E0CA;
     }
     .topic-item {
       padding: 5px 0;
@@ -57,39 +75,164 @@ head
     .topic-item:last-child {
       border-bottom: none; /* Remove separator from the last item */
     }
+    .popup {
+      display: none; /* Hidden by default */
+      position: fixed; /* Stay in place when scrolling */
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: white;
+      border: 1px solid #333;
+      padding: 20px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      z-index: 1000; /* Ensure it's on top */
+    }
+    .popup-content {
+      white-space: pre-wrap; /* Preserve formatting and wrap text */
+    }
+    .popup-close {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      cursor: pointer;
+      font-size: 1.2em;
+    }
+    .overlay {
+      display: none; /* Hidden by default */
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black */
+      z-index: 999; /* Below the popup */
+    }
+    .kebab-button {
+      background-color: transparent;
+      color: #333;
+      border: none;
+      padding: 8px 10px;
+      cursor: pointer;
+    }
 
+    .dot {
+      display: block;
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background-color: #333;
+      margin: 2px 0;
+    }
+
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      background-color: #f9f9f9;
+      min-width: 120px;
+      box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+      z-index: 1;
+      right: 0;
+      border-radius: 4px;
+    }
+
+    .dropdown-content a {
+      color: black;
+      padding: 12px 16px;
+      text-decoration: none;
+      display: block;
+    }
+
+    .dropdown-content a:hover {
+      background-color: #ddd;
+    }
+
+    .dropdown-container:hover .dropdown-content,
+    .dropdown-container.open .dropdown-content {
+      display: block;
+    }
 
 body
-  .container
-    .tabs
-      button.tab.active Topics
-      button.tab Consumers
-      button.tab Producers
+  .container-main(style="display: flex; align-items: center;")
+    .container
+      .tabs
+        button.tab.active Topics
+        button.tab Consumers
+        button.tab Producers
+      .topic-list
+        if topics && topics.length > 0
+          each topic in topics
+            .topic-item(onclick=`handleTopicClick("${topic}")`)= topic
+        else
+          .topic-item No topics found.
+    .popup#produceMsgPopup
+      .popup-close &times;
+      select(id="topicsDropdown")
+        if topics && topics.length > 0
+          each topic in topics
+            option(value=topic)= topic
+        else
+          No topics
+      textarea.msgContent
+      button.sendMsg Send
+    .dropdown-container
+      button.kebab-button
+        span.dot
+        span.dot
+        span.dot
+      .dropdown-content
+        a(href="#") Produce message
+        a(href="#") Clean topic
+        a(href="#") Create topic
+    <!--button.produceMsgBtn(style="margin-top: 20px; margin-left:10px") Produce Message-->
 
-    .topic-list
-      if topics && topics.length > 0
-        each topic in topics
-          .topic-item(onclick=`handleTopicClick("${topic}")`)= topic
-      else
-        .topic-item No topics found.
 
   script.
+    const popup = document.getElementById('produceMsgPopup');
+    const popupClose = document.querySelector('.popup-close');
+    const produceMsgBtn = document.querySelector('.produceMsgBtn');
+    const sendMsgBtn = document.querySelector('.sendMsg');
+
+    sendMsgBtn.addEventListener('click', () => {
+      sendMsg();
+    });
+
+    produceMsgBtn.addEventListener('click', () => {
+      popup.style.display = 'block';
+    });
+
+    popupClose.addEventListener('click', () => {
+      popup.style.display = 'none';
+    });
+
+
     function handleTopicClick(topic) {
       // Send request to backend here
       console.log("Clicked on topic:", topic);
 
       // Example using fetch API (replace with your actual backend endpoint)
-      fetch('/api/topicDetails?topic=' + topic) // Send topic as query parameter
-        .then(response => response.json())
-        .then(data => {
-          console.log("Response from backend:", data);
-          // Update UI with topic details (e.g., in the grey box area)
-          const detailsArea = document.getElementById('topic-details');
-          if (detailsArea) {
-            detailsArea.innerHTML = JSON.stringify(data, null, 2); // Display data in the details area
-          }
+      fetch('/getTopic/' + topic) // Send topic as query parameter
+      .then(response => {
+        if(response.redirected){
+          window.location.href = response.url;
+        }
+      })
+    }
+
+    function sendMsg(){
+      const selectDropdown = document.getElementById("topicsDropdown");
+      const selectedTopic = selectDropdown.options[selectDropdown.selectedIndex].text;
+      fetch('/api/postMessage',
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          "topic": selectedTopic,
+          "message": document.querySelector(".msgContent").value
         })
-        .catch(error => {
-          console.error("Error fetching topic details:", error);
-        });
+      }).then(response => {
+        popup.style.display = 'none';
+        document.querySelector(".msgContent").value = "";
+      })
     }

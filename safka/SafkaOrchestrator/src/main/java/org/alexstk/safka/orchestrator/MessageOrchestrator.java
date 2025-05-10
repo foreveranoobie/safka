@@ -5,11 +5,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.alexstk.safka.orchestrator.entity.Message;
 import org.alexstk.safka.orchestrator.entity.Topic;
+import org.alexstk.safka.orchestrator.file.FileProcessor;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.List;
@@ -23,13 +21,18 @@ public class MessageOrchestrator {
     private ExecutorService executorService = Executors.newFixedThreadPool(1); // Adjust thread pool size as needed
     private int tcpPort;
     private ObjectMapper objectMapper = new ObjectMapper();
+    private FileProcessor fileProcessor = new FileProcessor();
 
     public MessageOrchestrator(int tcpPort) {
         this.tcpPort = tcpPort;
     }
 
-    public void createTopic(String topicName) {
-        topics.put(topicName, new Topic(topicName));
+    public boolean createTopic(String topicName) {
+        if (topics.get(topicName) == null) {
+            topics.put(topicName, new Topic(topicName));
+            return true;
+        }
+        return false;
     }
 
     public void startListening() {
@@ -72,7 +75,16 @@ public class MessageOrchestrator {
 
             if (kafkaCommand.equals("PUBLISH")) {
                 String topicName = jsonNode.get("topicName").asText(); // Get topic name from JSON
-                Topic topic = topics.get(topicName);
+                String contents = jsonNode.get("contents").asText();
+                try {
+                    fileProcessor.writeMessageToTopic(topicName, new Message(contents, System.currentTimeMillis()));
+                    return "{\"status\": \"Message published for topic: " + topicName + "\"}";
+                } catch (FileNotFoundException ex){
+                    System.out.println("Topic not found: " + topicName);
+                    return "404";
+                }
+
+                /*Topic topic = topics.get(topicName);
                 if (topic != null) {
                     String contents = jsonNode.get("contents").asText();
                     topic.addMessage(new Message(contents, System.currentTimeMillis()));
@@ -80,23 +92,38 @@ public class MessageOrchestrator {
                     return "{\"status\": \"Message published for topic: " + topicName + "\"}";
                 } else {
                     System.out.println("Topic not found: " + topicName);
-                }
+                    return "404";
+                }*/
             } else if (kafkaCommand.equals("READ")) {
-                String topicName = jsonNode.get("topicName").asText(); // Get topic name from JSON
+                String topicName = jsonNode.get("topicName").asText();
+                try {
+                    List<Message> messages = fileProcessor.getMessagesFromTopic(topicName);
+                    return objectMapper.writeValueAsString(messages);
+                } catch (RuntimeException ex) {
+                    return "404";
+                }
+                /*String topicName = jsonNode.get("topicName").asText(); // Get topic name from JSON
                 Topic topic = topics.get(topicName);
                 if (topic != null) {
                     List<Message> messages = topic.getMessages();
                     return objectMapper.writeValueAsString(messages); // Return messages as JSON array
                 } else {
                     return "{\"error\": \"Topic not found: " + topicName + "\"}"; // Return error as JSON
-                }
+                }*/
             } else if (kafkaCommand.equals("CREATE_TOPIC")) {
                 String topicName = jsonNode.get("topicName").asText(); // Get topic name from JSON
-                createTopic(topicName); // Create the topic
+                //if(createTopic(topicName)) { // Create the topic
+                fileProcessor.createFolderForTopic(topicName);
+                //}
                 return "{\"status\": \"Topic created: " + topicName + "\"}"; // Send success message
             } else if (kafkaCommand.equals("GET_TOPICS")) {
-                return objectMapper.writeValueAsString(topics.keySet());
-            } else {
+                return objectMapper.writeValueAsString(fileProcessor.listTopics());
+            } else if (kafkaCommand.equals("CLEAN")) {
+                String topicName = jsonNode.get("topicName").asText();
+                fileProcessor.cleanTopic(topicName);
+                return  "{\"status\": \"Topic removed\"}";
+            }
+            else {
                 System.out.println("Unknown kafkaCommand: " + kafkaCommand);
             }
         } catch (IOException e) {
