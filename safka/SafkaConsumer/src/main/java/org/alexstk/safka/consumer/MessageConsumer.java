@@ -15,6 +15,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Scanner;
 
 // ... (Message and Topic classes remain the same)
@@ -90,7 +91,7 @@ public class MessageConsumer { // Renamed to Client for more general use
 
         if (messages != null) {
             System.out.println("Messages from topic " + topicName);
-            messages.forEach(msg -> System.out.printf("Message: %s\nTimestamp: %s\n---\n", msg.get("content"), msg.get("timestamp")));
+            messages.forEach(msg -> System.out.printf("Key: %s\nMessage: %s\nTimestamp: %s\n---\n", msg.get("key"), msg.get("content"), msg.get("timestamp")));
         }
     }
 

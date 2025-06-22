@@ -12,4 +12,5 @@ public class Message implements Serializable {
     @NonNull
     private String content;
     private long timestamp;
+    private String key;
 }
