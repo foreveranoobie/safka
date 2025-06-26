@@ -6,16 +6,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.alexstk.safka.orchestrator.file.FileProcessor;
 
 public class GetTopicsMessageHandler extends AbstractResponseMessageHandler {
-    public GetTopicsMessageHandler(ObjectMapper objectMapper, FileProcessor fileProcessor) {
-        super(objectMapper, fileProcessor);
-    }
 
-    @Override
-    public String performOperation(JsonNode jsonMessage) {
-        try {
-            return objectMapper.writeValueAsString(fileProcessor.listTopics());
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
-    }
+  public GetTopicsMessageHandler(ObjectMapper objectMapper, FileProcessor fileProcessor) {
+    super(objectMapper, fileProcessor);
+  }
+
+  @Override
+  public String performOperation(JsonNode jsonMessage) throws JsonProcessingException {
+    return objectMapper.writeValueAsString(fileProcessor.listTopics());
+  }
 }

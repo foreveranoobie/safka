@@ -11,17 +11,17 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class HandlerChannelInitializer extends ChannelInitializer<SocketChannel> {
 
-    private ChannelInboundHandlerAdapter adapter;
+  private ChannelInboundHandlerAdapter adapter;
 
-    @Override
-    protected void initChannel(SocketChannel socketChannel) throws Exception {
-        socketChannel.pipeline()
-                .addLast("encoder", new StringEncoder())
-                .addLast("decoder", new StringDecoder())
-                // Logging handler
-                .addLast(new LoggingHandler())
-                // Sends messages to the listener
-                // Sends the response after any request
-                .addLast(adapter);
-    }
+  @Override
+  protected void initChannel(SocketChannel socketChannel) throws Exception {
+    socketChannel.pipeline()
+        .addLast("encoder", new StringEncoder())
+        .addLast("decoder", new StringDecoder())
+        // Logging handler
+        .addLast(new LoggingHandler())
+        // Sends messages to the listener
+        // Sends the response after any request
+        .addLast(adapter);
+  }
 }

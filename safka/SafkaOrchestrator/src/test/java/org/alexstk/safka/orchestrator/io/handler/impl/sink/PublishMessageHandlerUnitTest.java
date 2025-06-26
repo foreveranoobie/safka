@@ -1,7 +1,11 @@
 package org.alexstk.safka.orchestrator.io.handler.impl.sink;
 
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.refEq;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
 import org.alexstk.safka.orchestrator.entity.Message;
 import org.alexstk.safka.orchestrator.file.FileProcessor;
 import org.junit.jupiter.api.Test;
@@ -11,37 +15,35 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.io.IOException;
-
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.refEq;
-
 @ExtendWith(MockitoExtension.class)
 public class PublishMessageHandlerUnitTest {
-    @Mock
-    private FileProcessor fileProcessor;
 
-    @InjectMocks
-    private PublishMessageHandler handler;
+  @Mock
+  private FileProcessor fileProcessor;
 
-    private ObjectMapper objectMapper = new ObjectMapper();
+  @InjectMocks
+  private PublishMessageHandler handler;
 
-    @Test
-    public void shouldPublishMessage_whenPerformOperation_givenMessage() throws IOException {
-        //given
-        String topicName = "topicName";
-        String key = "123";
-        String contents = "contents";
+  private final ObjectMapper objectMapper = new ObjectMapper();
 
-        JsonNode givenMessage = objectMapper.createObjectNode().put("topicName", topicName).put("key", key).put("contents", contents);
+  @Test
+  public void shouldPublishMessage_whenPerformOperation_givenMessage() throws IOException {
+    //given
+    String topicName = "topicName";
+    String key = "123";
+    String contents = "contents";
 
-        Message expectedMessage = new Message(contents, System.currentTimeMillis(), key);
+    JsonNode givenMessage = objectMapper.createObjectNode().put("topicName", topicName)
+        .put("key", key).put("contents", contents);
 
-        //when
-        handler.performOperation(givenMessage);
+    Message expectedMessage = new Message(contents, System.currentTimeMillis(), key);
 
-        //then
-        Mockito.verify(fileProcessor).writeMessageToTopic(eq(topicName), refEq(expectedMessage, "timestamp"));
+    //when
+    handler.performOperation(givenMessage);
 
-    }
+    //then
+    Mockito.verify(fileProcessor)
+        .writeMessageToTopic(eq(topicName), refEq(expectedMessage, "timestamp"));
+
+  }
 }

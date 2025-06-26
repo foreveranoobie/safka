@@ -8,15 +8,19 @@ import org.alexstk.safka.orchestrator.io.handler.impl.sink.CreateTopicMessageHan
 import org.alexstk.safka.orchestrator.io.handler.impl.sink.PublishMessageHandler;
 
 public class SafkaOrchestrator {
-    public static void main(String[] args) {
-        FileProcessor fileProcessor = new FileProcessor();
-        ObjectMapper objectMapper = new ObjectMapper();
-        GetTopicsMessageHandler getTopicsMessageHandler = new GetTopicsMessageHandler(objectMapper, fileProcessor);
-        ReadTopicMessageHandler readTopicMessageHandler = new ReadTopicMessageHandler(objectMapper, fileProcessor);
-        PublishMessageHandler publishMessageHandler = new PublishMessageHandler(fileProcessor);
-        CreateTopicMessageHandler createTopicMessageHandler = new CreateTopicMessageHandler(fileProcessor);
-        MessageOrchestrator orchestrator = new MessageOrchestrator(7500, getTopicsMessageHandler,
-                readTopicMessageHandler, publishMessageHandler, createTopicMessageHandler);
-        orchestrator.startListening();
-    }
+
+  public static void main(String[] args) {
+    FileProcessor fileProcessor = new FileProcessor();
+    ObjectMapper objectMapper = new ObjectMapper();
+    GetTopicsMessageHandler getTopicsMessageHandler = new GetTopicsMessageHandler(objectMapper,
+        fileProcessor);
+    ReadTopicMessageHandler readTopicMessageHandler = new ReadTopicMessageHandler(objectMapper,
+        fileProcessor);
+    PublishMessageHandler publishMessageHandler = new PublishMessageHandler(fileProcessor);
+    CreateTopicMessageHandler createTopicMessageHandler = new CreateTopicMessageHandler(
+        fileProcessor);
+    MessageOrchestrator orchestrator = new MessageOrchestrator(7500, getTopicsMessageHandler,
+        readTopicMessageHandler, publishMessageHandler, createTopicMessageHandler);
+    orchestrator.startListening();
+  }
 }

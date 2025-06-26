@@ -8,8 +8,9 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString
 public class KafkaMessage {
-    private String kafkaCommand;
-    private String topic;
-    private String contents;
-    private String key;
+
+  private String kafkaCommand;
+  private String topic;
+  private String contents;
+  private String key;
 }

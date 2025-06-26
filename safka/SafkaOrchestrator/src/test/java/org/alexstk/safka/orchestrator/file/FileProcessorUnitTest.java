@@ -1,103 +1,112 @@
 package org.alexstk.safka.orchestrator.file;
 
-import org.alexstk.safka.orchestrator.entity.Message;
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Test;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import org.alexstk.safka.orchestrator.entity.Message;
+import org.alexstk.safka.orchestrator.io.handler.impl.utils.TestUtils;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 
 public class FileProcessorUnitTest {
-    private static final String TOPICS_DIR = "E:\\git\\safka\\safka\\SafkaOrchestrator\\topics";
-    private final FileProcessor fileProcessor = new FileProcessor();
 
-    @AfterEach
-    public void cleanUp() throws IOException {
-        fileProcessor.removeTopicsFolder();
-    }
+  private static final String TOPICS_DIR = "E:\\git\\safka\\safka\\SafkaOrchestrator\\topics";
+  private final FileProcessor fileProcessor = new FileProcessor();
 
-    @Test
-    public void shouldCreateFolderForTopic_whenCreateFolderForTopic_givenTopicName() throws IOException {
-        //given
-        String givenTopicName = "test-topic";
+  @AfterEach
+  public void cleanUp() throws IOException {
+    TestUtils.removeTopicsFolder();
+  }
 
-        //when
-        fileProcessor.createFolderForTopic(givenTopicName);
+  @Test
+  public void shouldCreateFolderForTopic_whenCreateFolderForTopic_givenTopicName()
+      throws IOException {
+    //given
+    String givenTopicName = "test-topic";
 
-        //then
-        Assertions.assertThat(Arrays.stream(new File(TOPICS_DIR).listFiles()).map(File::getName).filter(givenTopicName::equals).findAny().isPresent()).isTrue();
-    }
+    //when
+    fileProcessor.createFolderForTopic(givenTopicName);
 
-    @Test
-    public void shouldCreateTopicOnlyOnce_whenCreateFolderForTopic_givenTopicNameWith2TimesCalled() throws IOException {
-        //given
-        String givenTopicName = "test-topic";
-        fileProcessor.createFolderForTopic(givenTopicName);
+    //then
+    Assertions.assertThat(Arrays.stream(new File(TOPICS_DIR).listFiles()).map(File::getName)
+        .filter(givenTopicName::equals).findAny().isPresent()).isTrue();
+  }
 
-        //when
-        fileProcessor.createFolderForTopic(givenTopicName);
+  @Test
+  public void shouldCreateTopicOnlyOnce_whenCreateFolderForTopic_givenTopicNameWith2TimesCalled()
+      throws IOException {
+    //given
+    String givenTopicName = "test-topic";
+    fileProcessor.createFolderForTopic(givenTopicName);
 
-        //then
-        Assertions.assertThat(Arrays.stream(new File(TOPICS_DIR).listFiles())).hasSize(1);
-    }
+    //when
+    fileProcessor.createFolderForTopic(givenTopicName);
 
-    @Test
-    public void shouldReturnEmptyList_whenListTopics_givenEmptyTopicsDirectory() {
-        //given
-        //when
-        List<String> actualTopics = fileProcessor.listTopics();
+    //then
+    Assertions.assertThat(Arrays.stream(new File(TOPICS_DIR).listFiles())).hasSize(1);
+  }
 
-        //then
-        Assertions.assertThat(actualTopics).isEmpty();
-    }
+  @Test
+  public void shouldReturnEmptyList_whenListTopics_givenEmptyTopicsDirectory() {
+    //given
+    //when
+    List<String> actualTopics = fileProcessor.listTopics();
 
-    @Test
-    public void shouldReturnListOfTopics_whenListTopics_givenTopicsDirectoryWith2Topics() throws IOException {
-        //given
-        String firstTopicName = "test-topic1";
-        String secondTopicName = "test-topic2";
+    //then
+    Assertions.assertThat(actualTopics).isEmpty();
+  }
 
-        fileProcessor.createFolderForTopic(firstTopicName);
-        fileProcessor.createFolderForTopic(secondTopicName);
+  @Test
+  public void shouldReturnListOfTopics_whenListTopics_givenTopicsDirectoryWith2Topics()
+      throws IOException {
+    //given
+    String firstTopicName = "test-topic1";
+    String secondTopicName = "test-topic2";
 
-        //when
-        List<String> actualTopics = fileProcessor.listTopics();
+    fileProcessor.createFolderForTopic(firstTopicName);
+    fileProcessor.createFolderForTopic(secondTopicName);
 
-        //then
-        Assertions.assertThat(actualTopics).containsExactlyInAnyOrder(firstTopicName, secondTopicName);
-    }
+    //when
+    List<String> actualTopics = fileProcessor.listTopics();
 
-    @Test
-    public void shouldWriteMessageToTheTopic_whenWriteMessageToTopic_givenMessageAndTopicName() throws IOException {
-        //given
-        Message givenMessage = new Message("Test", System.currentTimeMillis(), "123");
-        String givenTopicName = "test-topic";
-        fileProcessor.createFolderForTopic(givenTopicName);
+    //then
+    Assertions.assertThat(actualTopics).containsExactlyInAnyOrder(firstTopicName, secondTopicName);
+  }
 
-        //when
-        fileProcessor.writeMessageToTopic(givenTopicName, givenMessage);
+  @Test
+  public void shouldWriteMessageToTheTopic_whenWriteMessageToTopic_givenMessageAndTopicName()
+      throws IOException {
+    //given
+    Message givenMessage = new Message("Test", System.currentTimeMillis(), "123");
+    String givenTopicName = "test-topic";
+    fileProcessor.createFolderForTopic(givenTopicName);
 
-        //then
-        List<Message> actualMessages = fileProcessor.getMessagesFromTopic(givenTopicName);
-        Assertions.assertThat(actualMessages).usingRecursiveFieldByFieldElementComparator().containsExactlyInAnyOrder(givenMessage);
-    }
+    //when
+    fileProcessor.writeMessageToTopic(givenTopicName, givenMessage);
 
-    @Test
-    public void shouldNotWriteMessageToTheTopic_whenWriteMessageToTopic_givenMessageAndAbsentTopicName() throws IOException {
-        //given
-        Message givenMessage = new Message("Test", System.currentTimeMillis(), "123");
-        String givenTopicName = "test-topic";
+    //then
+    List<Message> actualMessages = fileProcessor.getMessagesFromTopic(givenTopicName);
+    Assertions.assertThat(actualMessages).usingRecursiveFieldByFieldElementComparator()
+        .containsExactlyInAnyOrder(givenMessage);
+  }
 
-        Message expectedMessage = new Message("Topic not found", 404, null);
+  @Test
+  public void shouldNotWriteMessageToTheTopic_whenWriteMessageToTopic_givenMessageAndAbsentTopicName()
+      throws IOException {
+    //given
+    Message givenMessage = new Message("Test", System.currentTimeMillis(), "123");
+    String givenTopicName = "test-topic";
 
-        //when
-        fileProcessor.writeMessageToTopic(givenTopicName, givenMessage);
+    Message expectedMessage = new Message("Topic not found", 404, null);
 
-        //then
-        List<Message> actualMessages = fileProcessor.getMessagesFromTopic(givenTopicName);
-        Assertions.assertThat(actualMessages).usingRecursiveFieldByFieldElementComparator().containsExactlyInAnyOrder(expectedMessage);
-    }
+    //when
+    fileProcessor.writeMessageToTopic(givenTopicName, givenMessage);
+
+    //then
+    List<Message> actualMessages = fileProcessor.getMessagesFromTopic(givenTopicName);
+    Assertions.assertThat(actualMessages).usingRecursiveFieldByFieldElementComparator()
+        .containsExactlyInAnyOrder(expectedMessage);
+  }
 }
