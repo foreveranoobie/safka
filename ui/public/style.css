@@ -152,7 +152,7 @@ body {
     overflow-y: auto;
 }
 
-#overlay {
+#overlay, #message-overlay, #topic-overlay {
     display: none;
     position: absolute;
     opacity: 50%;

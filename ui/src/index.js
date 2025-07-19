@@ -56,6 +56,11 @@ app.post('/api/postMessage', async (req, res) => {
   res.status(200).end()
 })
 
+app.post('/api/topic', async (req, res) => {
+  const jsonData = req.body;
+  runClient(JSON.stringify(new message.Message('CREATE_TOPIC', jsonData.topic)))
+  res.status(200).end()
+})
 
 function isJsonResponseError(rawString) {
   parsedJson = JSON.parse(rawString)

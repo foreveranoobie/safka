@@ -47,13 +47,43 @@ head
             margin-top: 10px;
         }
 
+        #create-topic {
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            position: absolute;
+            width: 45%;
+            height: 25%;
+            background-color: var(--msg-details-bg-color);
+            align-self: center;
+            z-index: 5;
+            border-radius: 10px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #create-topic >label {
+            margin: 15px 10px 5px 5px;
+        }
+
+        #create-topic > #name {
+            height: 15%;
+            width: 70%;
+        }
+
+        #create-topic > button {
+            border-radius: 10px;
+            margin-top: 10px;
+        }
+
 body
     <div class="page-body">
-        <div class="menu" style="height:200px">
+        <div class="menu" style="height:250px">
             <button class="active-btn">Topics</button>
             <button>Brokers</button>
             <button>Consumers</button>
             <button onclick="openSendMsg();">Send message</button>
+            <button onclick="openCreateTopic();">Create topic</button>
         </div>
         <div class="content-table">
             <div id="t-head">
@@ -72,7 +102,7 @@ body
             </div>
         </div>
     </div>
-    <label id="overlay" for="send-msg" onclick="closeSendMsg();"></label>
+    <label id="message-overlay" for="send-msg" onclick="closeSendMsg();"></label>
     <div id="send-msg">
         <label for="topic-name">Topic</label>
         <select id="topic-name">
@@ -85,6 +115,13 @@ body
         <label for="message-area">Message</label>
         <textarea id="message-area"></textarea>
         <button onclick="sendMsg();">Send</button>
+    </div>
+
+    <label id="topic-overlay" for="create-topic" onclick="closeCreateTopic();"></label>
+    <div id="create-topic">
+        <label for="topic-create-name">Topic name</label>
+        <input type="text" id="topic-create-name"/>
+        <button onclick="createTopic();">Create</button>
     </div>
 
     <footer>
@@ -121,6 +158,7 @@ body
                     }
                 })
         }
+
         function sendMsg() {
             const selectDropdown = document.getElementById("topic-name");
             const selectedTopic = selectDropdown.options[selectDropdown.selectedIndex].text;
@@ -139,11 +177,37 @@ body
                     closeSendMsg();
                 })
         }
+        
+        function createTopic(){
+            fetch('/api/topic', {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        "topic": document.getElementById("topic-create-name").value,
+                    })
+            }).then(response => {
+                window.location.reload();
+            })
+        }
+
         function closeSendMsg() {
-            document.getElementById('overlay').style.display = 'none'
+            document.getElementById('message-overlay').style.display = 'none'
             document.getElementById('send-msg').style.display = 'none'
         }
+
         function openSendMsg() {
-            document.getElementById('overlay').style.display = 'block'
+            document.getElementById('message-overlay').style.display = 'block'
             document.getElementById('send-msg').style.display = 'flex'
+        }
+
+        function closeCreateTopic() {
+            document.getElementById('topic-overlay').style.display = 'none'
+            document.getElementById('create-topic').style.display = 'none'
+        }
+
+        function openCreateTopic() {
+            document.getElementById('topic-overlay').style.display = 'block'
+            document.getElementById('create-topic').style.display = 'flex'
         }
