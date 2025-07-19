@@ -28,8 +28,8 @@ body
                 if messages && messages.length > 0
                     each message in messages
                         .row
-                            p=123
                             p=`${message.timestamp}`
+                            p=`${message.key}`
                             p=`${message.content}`
                         hr
                 else
@@ -83,8 +83,8 @@ body
                 document.getElementById('overlay').style.display = 'block'
                 document.getElementById('msg-details').style.display = 'flex'
 
-                document.querySelector('#msg-details').querySelector("#key-area").textContent = preview.children[0].textContent;
-                document.querySelector('#msg-details').querySelector("#timestamp-area").textContent = preview.children[1].textContent;
+                document.querySelector('#msg-details').querySelector("#timestamp-area").textContent = preview.children[0].textContent;
+                document.querySelector('#msg-details').querySelector("#key-area").textContent = preview.children[1].textContent;
                 document.querySelector('#msg-details').querySelector("#message-area").textContent = preview.children[2].textContent;
 
                 popupContent.textContent = fullContent;
