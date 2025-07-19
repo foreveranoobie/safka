@@ -16,10 +16,10 @@ public abstract class AbstractSinkMessageHandler implements MessageHandler {
     ctx.disconnect();
     try {
       performOperation(jsonMessage);
-    } catch (IOException e) {
+    } catch (Exception e) {
       throw new RuntimeException(e);
     }
   }
 
-  public abstract void performOperation(JsonNode jsonMessage) throws IOException;
+  public abstract void performOperation(JsonNode jsonMessage) throws IOException, Exception;
 }

@@ -25,6 +25,7 @@ public class SafkaOrchestratorEtETest {
 
   @BeforeEach
   public void setUp() {
+    TestUtils.removeTopicsFolder();
     TestUtils.createTopicsFolder();
   }
 

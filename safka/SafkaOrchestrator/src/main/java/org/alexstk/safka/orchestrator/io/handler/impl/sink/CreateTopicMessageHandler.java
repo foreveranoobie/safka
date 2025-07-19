@@ -11,7 +11,7 @@ public class CreateTopicMessageHandler extends AbstractSinkMessageHandler {
   }
 
   @Override
-  public void performOperation(JsonNode jsonMessage) throws IOException {
+  public void performOperation(JsonNode jsonMessage) throws Exception {
     String topicName = jsonMessage.get("topicName").asText();
     fileProcessor.createFolderForTopic(topicName);
   }

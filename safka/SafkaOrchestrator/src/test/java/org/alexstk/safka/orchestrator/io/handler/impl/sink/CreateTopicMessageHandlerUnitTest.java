@@ -21,7 +21,7 @@ public class CreateTopicMessageHandlerUnitTest {
   private final ObjectMapper objectMapper = new ObjectMapper();
 
   @Test
-  public void shouldCreateTopic_whenPerformOperation_givenTopicName() throws IOException {
+  public void shouldCreateTopic_whenPerformOperation_givenTopicName() throws Exception {
     //given
     String topicName = "topicName";
 

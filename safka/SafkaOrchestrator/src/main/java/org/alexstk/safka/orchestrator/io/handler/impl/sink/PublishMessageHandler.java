@@ -12,7 +12,7 @@ public class PublishMessageHandler extends AbstractSinkMessageHandler {
   }
 
   @Override
-  public void performOperation(JsonNode jsonMessage) throws IOException {
+  public void performOperation(JsonNode jsonMessage) throws Exception {
     String topicName = jsonMessage.get("topicName").asText(); // Get topic name from JSON
     String contents = jsonMessage.get("contents").asText();
     String key = jsonMessage.get("key").asText();

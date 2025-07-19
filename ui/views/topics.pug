@@ -136,8 +136,7 @@ body
                         "key": document.querySelector("#key-area").value
                     })
                 }).then(response => {
-                    popup.style.display = 'none';
-                    document.querySelector(".msgContent").value = "";
+                    closeSendMsg();
                 })
         }
         function closeSendMsg() {

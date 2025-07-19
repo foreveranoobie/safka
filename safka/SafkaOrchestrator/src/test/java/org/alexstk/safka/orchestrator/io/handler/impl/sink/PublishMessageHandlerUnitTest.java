@@ -27,7 +27,7 @@ public class PublishMessageHandlerUnitTest {
   private final ObjectMapper objectMapper = new ObjectMapper();
 
   @Test
-  public void shouldPublishMessage_whenPerformOperation_givenMessage() throws IOException {
+  public void shouldPublishMessage_whenPerformOperation_givenMessage() throws Exception {
     //given
     String topicName = "topicName";
     String key = "123";

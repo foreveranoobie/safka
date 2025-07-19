@@ -37,10 +37,13 @@ class MessageClient {
       }
 
       this.client.write(message + '\n', (err) => { // Add newline for message delimiter
+        console.log(`Sending message: ${message}`)
         if (err) {
+          console.log(`Received error: ${error.toString()}`)
           reject(err);
         } else {
           this.client.once('data', (data) => { // Use once to get a single response
+            console.log(`Received response: ${data.toString()}`)
             resolve(data.toString());
           });
         }

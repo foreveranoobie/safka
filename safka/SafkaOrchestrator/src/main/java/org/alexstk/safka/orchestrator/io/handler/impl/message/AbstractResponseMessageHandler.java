@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.netty.channel.ChannelHandlerContext;
 import java.io.IOException;
 import lombok.AllArgsConstructor;
+import org.alexstk.safka.orchestrator.entity.Message;
 import org.alexstk.safka.orchestrator.file.FileProcessor;
 import org.alexstk.safka.orchestrator.io.handler.MessageHandler;
 
@@ -22,10 +23,11 @@ public abstract class AbstractResponseMessageHandler implements MessageHandler {
       String response = performOperation(jsonMessage);
       ctx.writeAndFlush(response);
       ctx.disconnect();
-    } catch (IOException e) {
+    } catch (Exception e) {
       System.err.println(e.getMessage());
       try {
-        ctx.writeAndFlush(objectMapper.writeValueAsString("Internal error"));
+        String response = objectMapper.writeValueAsString(new Message("ERROR", 0L, null));
+        ctx.writeAndFlush(response);
       } catch (JsonProcessingException ex) {
         throw new RuntimeException(ex);
       }
