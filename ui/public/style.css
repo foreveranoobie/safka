@@ -1,0 +1,198 @@
+head, body {
+    margin: 0;
+    padding: 0;
+    font: caption;
+}
+
+:root {
+    --main-bg-color: rgb(255, 232, 205);
+    --table-head-bg-color: rgb(228, 203, 171);
+    --table-body-bg-color: rgb(253, 250, 246);
+    --menu-body-bg-color: rgb(179, 179, 179);
+    --msg-details-bg-color: rgb(203, 203, 203);
+    --menu-btn-bg-color-hover: rgb(58, 58, 58);
+}
+
+body {
+    background-color: var(--main-bg-color);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin: 0;
+    padding: 0;
+}
+
+.page-body {
+    display: flex;
+    flex-direction: row;
+    overflow-y: auto;
+    overflow-x: hidden;
+    max-height: 100vh;
+    column-gap: 2px;
+}
+
+.content-table {
+    z-index: 2;
+    background-color: var(--list-bg-color);
+    display: grid;
+    grid-template-rows: auto;
+    box-shadow: 7px 1px 19px 0px rgba(66, 68, 91, 1);
+    overflow-y: auto;
+    flex-grow: 1;
+    height: fit-content;
+}
+
+#t-head, #t-body {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+#t-head {
+    background-color: var(--table-head-bg-color);
+    border-bottom: 1px solid #735e39;
+    height: 50px;
+}
+
+#t-body {
+    background-color: var(--table-body-bg-color);
+    overflow-y: auto;
+    max-height: 100%;
+}
+
+#t-body > hr {
+    margin: 0 0;
+    border: ridge;
+}
+
+.row {
+    grid-template-columns: 1fr 1fr 2fr;
+    display: grid;
+    text-align: left;
+    box-sizing: border-box;
+    overflow-y: hidden;
+    padding-left: 10px;
+    white-space: pre-wrap;
+}
+
+.row > * {
+    height: 25px;
+}
+
+#t-body > .row:hover {
+    background-color: rgb(176, 176, 176);
+    transition: 500ms ease;
+}
+
+.menu {
+    margin-bottom: 15px;
+    z-index: 1;
+    top: 0;
+    display: inline-block;
+    display: grid;
+    grid-template-columns: auto;
+    background-color: var(--menu-body-bg-color);
+    align-self: stretch;
+    border-radius: 0 0 10px 10px;
+    box-shadow: 0px 5px 10px 1px rgba(66, 68, 91, 0.546);
+}
+
+.menu > button {
+    background-image: linear-gradient(to right, rgb(239, 239, 239) 65%, rgb(197, 197, 197) 100%, black 180%);
+    text-align: left;
+    border: 0;
+    transition: 500ms ease;
+    width: 150px;
+}
+
+.menu > .active-btn {
+    color: rgb(255, 241, 204);
+    background-image: linear-gradient(to right, rgb(72, 72, 72) 65%, rgb(197, 197, 197) 100%, rgb(239, 239, 239) 180%);
+    text-align: left;
+    border: 0;
+    transition: 500ms ease;
+}
+
+.menu > :not(.active-btn):hover {
+    text-align: left;
+    border: 0;
+    background-color: var(--menu-btn-bg-color-hover);
+    background-image: none;
+    color: rgb(255, 241, 204);
+    transition: 500ms ease;
+}
+
+.menu > button:last-child {
+    border-radius: 0 0 10px 10px;
+}
+
+#msg-details {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    position: absolute;
+    width: 75%;
+    height: 75%;
+    background-color: var(--msg-details-bg-color);
+    align-self: center;
+    z-index: 5;
+    border-radius: 10px;
+    white-space: pre-wrap;
+}
+
+#msg-details > label {
+    margin: 20px 10px 5px 5px;
+}
+
+#msg-details > div {
+    background-color: white;
+    padding: 5px;
+    margin: 5px 0;
+    max-height: 20%;
+    overflow-y: auto;
+}
+
+#overlay {
+    display: none;
+    position: absolute;
+    opacity: 50%;
+    width: 100%;
+    height: 100%;
+    background-color: black;
+    align-self: center;
+    z-index: 4;
+}
+
+button {
+    font: caption;
+}
+
+footer {
+    background-color: rgb(56, 103, 154); 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    align-content: center;
+    flex-wrap: wrap;
+    width: 100%;
+    margin-top: auto;
+}
+
+.active-page-num {
+    color: white;
+    font-size: 1.5rem;
+}
+
+footer > p {
+    margin: 0 10px;
+    transition: 500ms ease;
+    text-align: center;
+    vertical-align: middle;
+    box-sizing: border-box;
+}
+
+footer > p:not(.active-page-num):hover {
+    font-size: 1.2rem;
+    color:rgb(255, 216, 148);
+    transition: 500ms ease;
+}

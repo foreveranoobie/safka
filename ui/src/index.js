@@ -10,6 +10,14 @@ const port = 3000
 
 app.set('view engine', 'pug')
 
+app.use(express.static('public', {
+  setHeaders: (res, path) => {
+    if (path.endsWith('.css')) {
+      res.setHeader('Content-Type', 'text/css');
+    }
+  }
+}));
+
 app.get('/', async (req, res) => {
     response = await runClient(JSON.stringify(new message.Message('GET_TOPICS', null, null)))
     console.log(`Response returned ${response}`);
@@ -28,7 +36,7 @@ app.get('/api/topicDetails/:topic', async (req, res) => {
 
 app.post('/api/postMessage', async (req, res) => {
   const jsonData = req.body;
-  response = await runClient(JSON.stringify(new message.Message('PUBLISH', jsonData.topic, jsonData.message)))
+  response = await runClient(JSON.stringify(new message.Message('PUBLISH', jsonData.topic, jsonData.message, jsonData.key)))
   res.status(200).end()
 })
 
