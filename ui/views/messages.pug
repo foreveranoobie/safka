@@ -1,12 +1,52 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Safka Messages</title>
-    <link rel="stylesheet" href="/style.css">
-</head>
+head
+    meta(charset="UTF-8")
+    meta(name="viewport" content="width=device-width, initial-scale=1.0")
+    link(rel="stylesheet" href="/style.css")
+    title Messages Page
+    style.
+        #send-msg {
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            position: absolute;
+            width: 75%;
+            height: 75%;
+            background-color: var(--msg-details-bg-color);
+            align-self: center;
+            z-index: 5;
+            border-radius: 10px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #send-msg>label {
+            margin: 15px 10px 5px 5px;
+        }
+
+        #send-msg>#key-area {
+            height: 10%;
+        }
+
+        #send-msg>#message-area {
+            height: 30%;
+        }
+
+        #send-msg>textarea {
+            background-color: white;
+            margin: 5px 0;
+            overflow-y: auto;
+            box-sizing: content-box;
+            width: 95%;
+            resize: none;
+        }
+
+        #send-msg>button {
+            border-radius: 10px;
+            margin-top: 10px;
+        }
 
 body
     <div class="page-body">
@@ -14,7 +54,7 @@ body
             <button onclick="window.location.href='/'">Topics</button>
             <button>Brokers</button>
             <button>Consumers</button>
-            <button>Send message</button>
+            <button onclick="openSendMsg();">Send message</button>
         </div>
         <div class="content-table">
             <div id="t-head">
@@ -39,18 +79,27 @@ body
     </div>
     <label id="overlay" for="msg-details" onclick="closeMsgDetails();"></label>
     <div id="msg-details">
-        <label for="timestamp-area">Timestamp</label>
-        <div id="timestamp-area">
+        <label for="details-timestamp-area">Timestamp</label>
+        <div id="details-timestamp-area">
             <p></p>
         </div>
+        <label for="details-key-area">Message key</label>
+        <div id="details-key-area">
+            <p></p>
+        </div>
+        <label for="details-message-area">Message</label>
+        <div id="details-message-area">
+            <p></p>
+        </div>
+    </div>
+    <label id="message-overlay" for="send-msg" onclick="closeSendMsg();"></label>
+    <div id="send-msg">
+        p(id="topic-name")=`${topicName}`
         <label for="key-area">Message key</label>
-        <div id="key-area">
-            <p></p>
-        </div>
+        <textarea id="key-area"></textarea>
         <label for="message-area">Message</label>
-        <div id="message-area">
-            <p></p>
-        </div>
+        <textarea id="message-area"></textarea>
+        <button onclick="sendMsg();">Send</button>
     </div>
     <footer>
         <svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 -960 960 960" width="48px" fill="#FFFFFF">
@@ -83,9 +132,9 @@ body
                 document.getElementById('overlay').style.display = 'block'
                 document.getElementById('msg-details').style.display = 'flex'
 
-                document.querySelector('#msg-details').querySelector("#timestamp-area").textContent = preview.children[0].textContent;
-                document.querySelector('#msg-details').querySelector("#key-area").textContent = preview.children[1].textContent;
-                document.querySelector('#msg-details').querySelector("#message-area").textContent = preview.children[2].textContent;
+                document.querySelector('#msg-details').querySelector("#details-timestamp-area").textContent = preview.children[0].textContent;
+                document.querySelector('#msg-details').querySelector("#details-key-area").textContent = preview.children[1].textContent;
+                document.querySelector('#msg-details').querySelector("#details-message-area").textContent = preview.children[2].textContent;
 
                 popupContent.textContent = fullContent;
                 popup.style.display = 'block';
@@ -98,6 +147,23 @@ body
             }
         });
 
+        function sendMsg() {
+            fetch('/api/postMessage',
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        "topic": document.querySelector("#topic-name").innerHTML,
+                        "message": document.querySelector("#message-area").value,
+                        "key": document.querySelector("#key-area").value
+                    })
+                }).then(response => {
+                    closeSendMsg();
+                })
+        }
+
         function closeMsgDetails() {
             document.getElementById('overlay').style.display = 'none'
             document.getElementById('msg-details').style.display = 'none'
@@ -106,6 +172,16 @@ body
         function openMsgDetails() {
             document.getElementById('overlay').style.display = 'block'
             document.getElementById('msg-details').style.display = 'flex'
+        }
+
+        function closeSendMsg() {
+            document.getElementById('message-overlay').style.display = 'none'
+            document.getElementById('send-msg').style.display = 'none'
+        }
+
+        function openSendMsg() {
+            document.getElementById('message-overlay').style.display = 'block'
+            document.getElementById('send-msg').style.display = 'flex'
         }
 
 </html>

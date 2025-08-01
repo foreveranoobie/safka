@@ -17,7 +17,7 @@ import org.alexstk.safka.orchestrator.entity.Message;
 
 public class FileProcessor {
 
-  private static final String TOPICS_DIR = "E:\\git\\safka\\safka\\SafkaOrchestrator\\topics";
+  private static final String TOPICS_DIR = "topics";
 
   public FileProcessor() {
     createTopicsFolder();
