@@ -34,7 +34,6 @@ public class MessageOrchestrator {
       1); // Adjust thread pool size as needed
   private final int tcpPort;
   private final ObjectMapper objectMapper = new ObjectMapper();
-  private final FileProcessor fileProcessor = new FileProcessor();
   private final HandlerChannelInitializer handlerChannelInitializer;
   IoEventLoopGroup bossGroup;
   EventLoopGroup workerGroup;

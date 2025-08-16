@@ -21,12 +21,13 @@ import org.junit.jupiter.api.Test;
 public class SafkaOrchestratorEtETest {
 
   private final ObjectMapper objectMapper = new ObjectMapper();
-  private final FileProcessor fileProcessor = new FileProcessor();
+  private FileProcessor fileProcessor;
 
   @BeforeEach
   public void setUp() {
     TestUtils.removeTopicsFolder();
     TestUtils.createTopicsFolder();
+    fileProcessor = TestUtils.getFileProcessor();
   }
 
   @AfterEach

@@ -3,10 +3,12 @@ const express = require('express')
 const pug = require('pug')
 const message = require('./entity/message')
 const bodyParser = require('body-parser')
+const PropertiesReader = require('properties-reader')
+const props = PropertiesReader('src/resources/application.properties')
 
 const app = express()
 app.use(bodyParser.json())
-const port = 3000
+const port = props.get('app.port')
 
 app.set('view engine', 'pug')
 
@@ -28,7 +30,7 @@ app.get('/', async (req, res) => {
     )
     if (isJsonResponseError(response)) {
       console.error('Error on orchestrator side')
-      res.status(500).end()
+      res.render('error')
       return
     }
   } catch (error) {
@@ -50,8 +52,10 @@ app.get('/api/topicDetails/:topic', async (req, res) => {
   )
   if (isJsonResponseError(response)) {
     console.error('Error on orchestrator side')
-    res.status(500).end()
+    res.render('error')
     return
+    /*res.status(500).end()
+    return*/
   }
   res.render('messages', {
     messages: JSON.parse(response),
@@ -81,6 +85,9 @@ app.post('/api/topic', async (req, res) => {
 })
 
 function isJsonResponseError (rawString) {
+  if (rawString === undefined) {
+    return true
+  }
   parsedJson = JSON.parse(rawString)
   return (
     parsedJson !== undefined &&
@@ -94,8 +101,8 @@ app.listen(port, () => {
 })
 
 async function runClient (jsonMessage) {
-  const host = 'localhost' // Replace with your orchestrator's host
-  const port = 7500 // Replace with your orchestrator's port
+  const host = props.get('orchestrator.url')
+  const port = props.get('orchestrator.port')
 
   const client = new messageClient.MessageClient(host, port)
 

@@ -8,12 +8,18 @@ import org.alexstk.safka.orchestrator.entity.Message;
 import org.alexstk.safka.orchestrator.io.handler.impl.utils.TestUtils;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 public class FileProcessorUnitTest {
 
-  private static final String TOPICS_DIR = "E:\\git\\safka\\safka\\SafkaOrchestrator\\topics";
-  private final FileProcessor fileProcessor = new FileProcessor();
+  private static final String TOPICS_DIR = String.format("..%stopics", File.separator);
+  private FileProcessor fileProcessor = TestUtils.getFileProcessor();
+
+  @BeforeEach
+  public void setUp(){
+    TestUtils.createTopicsFolder();
+  }
 
   @AfterEach
   public void cleanUp() throws IOException {

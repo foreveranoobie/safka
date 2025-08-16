@@ -13,19 +13,25 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+
 import org.alexstk.safka.orchestrator.entity.Message;
 
 public class FileProcessor {
 
-  private static final String TOPICS_DIR = "topics";
+  private String topicsDir;
 
-  public FileProcessor() {
+  public FileProcessor(String topicsDir) {
+    if(topicsDir == null) {
+      this.topicsDir = "topics";
+    } else {
+      this.topicsDir = topicsDir;
+    }
     createTopicsFolder();
   }
 
   public void createFolderForTopic(String topicName) throws IOException {
     try {
-      Files.createDirectory(Path.of(TOPICS_DIR + "\\" + topicName));
+      Files.createDirectory(Path.of(getTopicPathWithFileSeparator(topicName)));
     } catch (FileAlreadyExistsException ex) {
       System.err.printf("Topic %s already exists\n", topicName);
     }
@@ -33,9 +39,12 @@ public class FileProcessor {
 
   public void writeMessageToTopic(String topicName, Message message) throws IOException {
     if (topicExists(topicName)) {
+      String pathTxt = String.format("%s.txt",
+          getPathSeparatedWithArguments(getTopicPathWithFileSeparator(topicName),
+              message.getKey()));
+      System.err.printf("Writing message: %s\n", pathTxt);
       FileOutputStream fileOutputStream
-          = new FileOutputStream(
-          String.format("%s\\%s\\%s.txt", TOPICS_DIR, topicName, message.getKey()));
+          = new FileOutputStream(pathTxt);
       try (ObjectOutputStream objectOutputStream
           = new ObjectOutputStream(fileOutputStream)) {
         objectOutputStream.writeObject(message);
@@ -45,7 +54,7 @@ public class FileProcessor {
   }
 
   public void cleanTopic(String topicName) throws IOException {
-    Path directory = Paths.get(TOPICS_DIR, topicName);
+    Path directory = Paths.get(topicsDir, topicName);
 
     File directoryFile = directory.toFile();
     File[] files = directoryFile.listFiles();
@@ -58,19 +67,20 @@ public class FileProcessor {
   }
 
   public List<String> listTopics() {
-    return Arrays.stream(new File(TOPICS_DIR).listFiles()).map(File::getName)
+    return Arrays.stream(new File(topicsDir).listFiles()).map(File::getName)
         .collect(Collectors.toList());
   }
 
   public List<Message> getMessagesFromTopic(String topicName) {
     if (topicExists(topicName)) {
-      return Arrays.stream(new File(TOPICS_DIR + "\\" + topicName).listFiles()).map(file -> {
-        try {
-          return getMessageFromFile(file);
-        } catch (IOException | ClassNotFoundException e) {
-          throw new RuntimeException(e);
-        }
-      }).collect(Collectors.toList());
+      return Arrays.stream(new File(getTopicPathWithFileSeparator(topicName)).listFiles())
+          .map(file -> {
+            try {
+              return getMessageFromFile(file);
+            } catch (IOException | ClassNotFoundException e) {
+              throw new RuntimeException(e);
+            }
+          }).collect(Collectors.toList());
     } else {
       return List.of(new Message("Topic not found", 404, null));
     }
@@ -89,7 +99,7 @@ public class FileProcessor {
 
   public void createTopicsFolder() {
     try {
-      Files.createDirectory(Path.of(TOPICS_DIR));
+      Files.createDirectory(Path.of(topicsDir));
     } catch (FileAlreadyExistsException e) {
       System.out.println("Topics folder exists. No need to create");
     } catch (IOException e) {
@@ -98,12 +108,12 @@ public class FileProcessor {
   }
 
   public void removeTopicsFolder() throws IOException {
-    Path topicsDirPath = Path.of(TOPICS_DIR);
+    Path topicsDirPath = Path.of(topicsDir);
     if (Files.exists(topicsDirPath)) {
       listTopics().forEach(topicName -> {
         try {
           cleanTopic(topicName);
-          Files.delete(Path.of(TOPICS_DIR + "\\" + topicName));
+          Files.delete(Path.of(getTopicPathWithFileSeparator(topicName)));
         } catch (IOException e) {
           throw new RuntimeException(e);
         }
@@ -114,5 +124,13 @@ public class FileProcessor {
 
   public boolean topicExists(String topicName) {
     return listTopics().stream().anyMatch(topicName::equals);
+  }
+
+  private String getPathSeparatedWithArguments(String leftSubPath, String rightSubPath) {
+    return String.format("%s%s%s", leftSubPath, File.separator, rightSubPath);
+  }
+
+  private String getTopicPathWithFileSeparator(String topicName) {
+    return String.format("%s%s%s", topicsDir, File.separator, topicName);
   }
 }
