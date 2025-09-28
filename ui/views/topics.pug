@@ -4,7 +4,9 @@ head
   meta(charset="UTF-8")
   meta(name="viewport" content="width=device-width, initial-scale=1.0")
   link(rel="stylesheet" href="/style.css")
+  script(type= 'text/javascript',src="/scripts.js")
   title Topics Page
+
   style.
         #send-msg {
             display: none;
@@ -76,7 +78,10 @@ head
             margin-top: 10px;
         }
 
+include includes/header.pug
+
 body
+    include includes/user-info.pug
     <div class="page-body">
         <div class="menu" style="height:250px">
             <button class="active-btn">Topics</button>
@@ -190,16 +195,6 @@ body
             }).then(response => {
                 window.location.reload();
             })
-        }
-
-        function closeSendMsg() {
-            document.getElementById('message-overlay').style.display = 'none'
-            document.getElementById('send-msg').style.display = 'none'
-        }
-
-        function openSendMsg() {
-            document.getElementById('message-overlay').style.display = 'block'
-            document.getElementById('send-msg').style.display = 'flex'
         }
 
         function closeCreateTopic() {

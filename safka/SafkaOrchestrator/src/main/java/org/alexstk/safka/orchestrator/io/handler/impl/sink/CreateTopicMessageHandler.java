@@ -6,13 +6,13 @@ import org.alexstk.safka.orchestrator.file.FileProcessor;
 
 public class CreateTopicMessageHandler extends AbstractSinkMessageHandler {
 
-  public CreateTopicMessageHandler(FileProcessor fileProcessor) {
-    super(fileProcessor);
-  }
+    public CreateTopicMessageHandler(FileProcessor fileProcessor) {
+        super(fileProcessor);
+    }
 
-  @Override
-  public void performOperation(JsonNode jsonMessage) throws Exception {
-    String topicName = jsonMessage.get("topicName").asText();
-    fileProcessor.createFolderForTopic(topicName);
-  }
+    @Override
+    public void performOperation(JsonNode jsonMessage) throws Exception {
+        String topicName = jsonMessage.get("topicName").asText();
+        fileProcessor.createFolderForTopic(topicName);
+    }
 }

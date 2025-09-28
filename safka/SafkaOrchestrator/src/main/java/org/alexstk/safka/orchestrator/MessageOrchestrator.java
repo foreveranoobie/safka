@@ -72,7 +72,7 @@ public class MessageOrchestrator {
           .childOption(ChannelOption.TCP_NODELAY, true);
 
       // Bind and start to accept incoming connections.
-      ChannelFuture f = b.bind(7500).sync();
+      ChannelFuture f = b.bind(tcpPort).sync();
       System.out.println("Safka server started");
 
       ChannelFuture channelFuture = f.channel().closeFuture().sync();

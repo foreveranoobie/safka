@@ -25,7 +25,8 @@ public class MessageConsumer { // Renamed to Client for more general use
     private final String orchestratorHost;
     private final int orchestratorPort;
     private final ObjectMapper objectMapper = new ObjectMapper();
-    private final Scanner scanner = new Scanner(System.in); // Scanner for user input
+    private final Scanner scanner = new Scanner(
+        System.in); // Scanner for user input
 
     public MessageConsumer(String orchestratorHost, int orchestratorPort) {
         this.orchestratorHost = orchestratorHost;
@@ -34,8 +35,10 @@ public class MessageConsumer { // Renamed to Client for more general use
 
     private String sendMessage(Message message) throws IOException {
         try (Socket socket = new Socket(orchestratorHost, orchestratorPort);
-             PrintWriter writer = new PrintWriter(socket.getOutputStream(), true);
-             BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
+            PrintWriter writer = new PrintWriter(socket.getOutputStream(),
+                true);
+            BufferedReader reader = new BufferedReader(
+                new InputStreamReader(socket.getInputStream()))) {
 
             writer.println(objectMapper.writeValueAsString(message));
             return reader.readLine(); // Return the response
@@ -75,7 +78,8 @@ public class MessageConsumer { // Renamed to Client for more general use
         System.out.print("Enter topic name: ");
         String topicName = scanner.nextLine();
 
-        Message message = new Message("CREATE_TOPIC", topicName, null); //topicName will be passed as a field
+        Message message = new Message(null, "CREATE_TOPIC", topicName,
+            null); //topicName will be passed as a field
 
         sendMessage(message);
     }
@@ -84,14 +88,18 @@ public class MessageConsumer { // Renamed to Client for more general use
         System.out.print("Enter topic name: ");
         String topicName = scanner.nextLine();
 
-        Message readMessage = new Message("READ", topicName, null);
+        Message readMessage = new Message(null, "READ", topicName, null);
 
         String response = sendMessage(readMessage);
         List<Map> messages = parseMessagesResponse(response);
 
         if (messages != null) {
             System.out.println("Messages from topic " + topicName);
-            messages.forEach(msg -> System.out.printf("Key: %s\nMessage: %s\nTimestamp: %s\n---\n", msg.get("key"), msg.get("content"), msg.get("timestamp")));
+            messages.forEach(
+                msg -> System.out.printf(
+                    "Key: %s\nMessage: %s\nTimestamp: %s\n---\n",
+                    msg.get("key"),
+                    msg.get("content"), msg.get("timestamp")));
         }
     }
 
@@ -99,10 +107,16 @@ public class MessageConsumer { // Renamed to Client for more general use
         System.out.print("Enter topic name: ");
         String topicName = scanner.nextLine();
 
+        String key = "";
+        while (key.isBlank()) {
+            System.out.print("Enter key: ");
+            key = scanner.nextLine();
+        }
         System.out.print("Enter message: ");
         String messageContent = scanner.nextLine();
 
-        Message publishMessage = new Message("PUBLISH", topicName, messageContent);
+        Message publishMessage = new Message(key, "PUBLISH", topicName,
+            messageContent);
 
         sendMessage(publishMessage);
     }
@@ -122,7 +136,8 @@ public class MessageConsumer { // Renamed to Client for more general use
         }
     }
 
-    private List<Map> parseMessagesResponse(String response) throws IOException {
+    private List<Map> parseMessagesResponse(String response)
+        throws IOException {
         try {
             JsonNode jsonNode = objectMapper.readTree(response);
             if (jsonNode.has("error")) {

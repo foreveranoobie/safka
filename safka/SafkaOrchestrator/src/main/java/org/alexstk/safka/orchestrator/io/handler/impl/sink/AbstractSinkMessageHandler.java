@@ -10,16 +10,16 @@ import org.alexstk.safka.orchestrator.io.handler.MessageHandler;
 @AllArgsConstructor
 public abstract class AbstractSinkMessageHandler implements MessageHandler {
 
-  FileProcessor fileProcessor;
+    FileProcessor fileProcessor;
 
-  public void readMessage(ChannelHandlerContext ctx, JsonNode jsonMessage) {
-    ctx.disconnect();
-    try {
-      performOperation(jsonMessage);
-    } catch (Exception e) {
-      throw new RuntimeException(e);
+    public void readMessage(ChannelHandlerContext ctx, JsonNode jsonMessage) {
+        ctx.disconnect();
+        try {
+            performOperation(jsonMessage);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
-  }
 
-  public abstract void performOperation(JsonNode jsonMessage) throws IOException, Exception;
+    public abstract void performOperation(JsonNode jsonMessage) throws IOException, Exception;
 }

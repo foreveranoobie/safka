@@ -5,6 +5,8 @@ const message = require('./entity/message')
 const bodyParser = require('body-parser')
 const PropertiesReader = require('properties-reader')
 const props = PropertiesReader('src/resources/application.properties')
+const { auth } = require('express-openid-connect')
+const path = require('path')
 
 const app = express()
 app.use(bodyParser.json())
@@ -22,11 +24,52 @@ app.use(
   })
 )
 
-app.get('/', async (req, res) => {
+app.use(
+  auth({
+    authRequired: true,
+    auth0Logout: true,
+    clientSecret: process.env.CLIENT_SECRET,
+    secret: process.env.CLIENT_SECRET,
+    baseURL: 'http://localhost:3000',
+    clientID: process.env.CLIENT_ID,
+    issuerBaseURL: process.env.ISSUER_BASE_URL,
+    authorizationParams: {
+      response_type: 'code', // This requires you to provide a client secret
+      audience: process.env.AUDIENCE,
+      scope: 'openid profile email'
+    },
+    afterCallback: (req, res, session) => {
+      // Access user profile here
+      console.log(JSON.stringify(req.oidc.accessToken))
+      console.log(JSON.stringify(req.oidc.user))
+      console.log('Access Token:', session.access_token)
+      console.log('ID Token:', session.id_token)
+
+      if (session.id_token) {
+        const jwt = require('jsonwebtoken')
+        const userClaims = jwt.decode(session.id_token)
+        session.userClaims = userClaims
+        console.log('User claims:', userClaims)
+      }
+
+      return session
+    }
+  })
+)
+
+app.get('/', async (req, res, session) => {
   let response
   try {
     response = await runClient(
-      JSON.stringify(new message.Message('GET_TOPICS', null, null))
+      JSON.stringify(
+        new message.Message(
+          'GET_TOPICS',
+          null,
+          null,
+          null,
+          req.oidc.accessToken
+        )
+      )
     )
     if (isJsonResponseError(response)) {
       console.error('Error on orchestrator side')
@@ -42,13 +85,27 @@ app.get('/', async (req, res) => {
   res.render('topics', { topics: JSON.parse(response) })
 })
 
+app.get('/info', async (req, res) => {
+  console.log(req.oidc.accessToken)
+  console.log(JSON.stringify(req.oidc.user))
+  console.log(JSON.stringify(await req.oidc.fetchUserInfo()))
+})
+
 app.get('/getTopic/:topic', async (req, res) => {
   res.redirect(`/api/topicDetails/${req.params['topic']}`)
 })
 
 app.get('/api/topicDetails/:topic', async (req, res) => {
   response = await runClient(
-    JSON.stringify(new message.Message('READ', req.params['topic'], null))
+    JSON.stringify(
+      new message.Message(
+        'READ',
+        req.params['topic'],
+        null,
+        null,
+        req.oidc.accessToken
+      )
+    )
   )
   if (isJsonResponseError(response)) {
     console.error('Error on orchestrator side')
@@ -71,7 +128,8 @@ app.post('/api/postMessage', async (req, res) => {
         'PUBLISH',
         jsonData.topic,
         jsonData.message,
-        jsonData.key
+        jsonData.key,
+        req.oidc.accessToken
       )
     )
   )
@@ -80,7 +138,17 @@ app.post('/api/postMessage', async (req, res) => {
 
 app.post('/api/topic', async (req, res) => {
   const jsonData = req.body
-  runClient(JSON.stringify(new message.Message('CREATE_TOPIC', jsonData.topic)))
+  runClient(
+    JSON.stringify(
+      new message.Message(
+        'CREATE_TOPIC',
+        jsonData.topic,
+        null,
+        null,
+        req.oidc.accessToken
+      )
+    )
+  )
   res.status(200).end()
 })
 

@@ -13,28 +13,28 @@ import org.alexstk.safka.orchestrator.io.handler.MessageHandler;
 @AllArgsConstructor
 public abstract class AbstractResponseMessageHandler implements MessageHandler {
 
-  ObjectMapper objectMapper;
-  FileProcessor fileProcessor;
+    ObjectMapper objectMapper;
+    FileProcessor fileProcessor;
 
-  @Override
-  public void readMessage(ChannelHandlerContext ctx, JsonNode jsonMessage) {
-    try {
-      performOperation(jsonMessage);
-      String response = performOperation(jsonMessage);
-      ctx.writeAndFlush(response);
-      ctx.disconnect();
-    } catch (Exception e) {
-      System.err.println(e.getMessage());
-      try {
-        String response = objectMapper.writeValueAsString(new Message("ERROR", 0L, null));
-        ctx.writeAndFlush(response);
-      } catch (JsonProcessingException ex) {
-        throw new RuntimeException(ex);
-      }
-    } finally {
-      ctx.disconnect();
+    @Override
+    public void readMessage(ChannelHandlerContext ctx, JsonNode jsonMessage) {
+        try {
+            performOperation(jsonMessage);
+            String response = performOperation(jsonMessage);
+            ctx.writeAndFlush(response);
+            ctx.disconnect();
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
+            try {
+                String response = objectMapper.writeValueAsString(new Message("ERROR", 0L, null, null));
+                ctx.writeAndFlush(response);
+            } catch (JsonProcessingException ex) {
+                throw new RuntimeException(ex);
+            }
+        } finally {
+            ctx.disconnect();
+        }
     }
-  }
 
-  public abstract String performOperation(JsonNode jsonMessage) throws JsonProcessingException;
+    public abstract String performOperation(JsonNode jsonMessage) throws JsonProcessingException;
 }

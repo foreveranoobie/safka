@@ -8,20 +8,15 @@ import lombok.ToString;
 import java.util.Random;
 
 @Getter
-@AllArgsConstructor
 @ToString
+@AllArgsConstructor
 public class Message {
+    private String key;
     @NonNull
     private String kafkaCommand;
     @NonNull
     private String topicName;
     private String contents;
-    private String key;
 
-    public Message(@NonNull String kafkaCommand, @NonNull String topicName, String contents) {
-        this.kafkaCommand = kafkaCommand;
-        this.topicName = topicName;
-        this.contents = contents;
-        key = String.valueOf(new Random().nextLong());
-    }
+
 }

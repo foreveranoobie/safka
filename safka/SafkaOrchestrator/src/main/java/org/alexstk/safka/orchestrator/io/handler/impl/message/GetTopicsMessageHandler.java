@@ -7,12 +7,12 @@ import org.alexstk.safka.orchestrator.file.FileProcessor;
 
 public class GetTopicsMessageHandler extends AbstractResponseMessageHandler {
 
-  public GetTopicsMessageHandler(ObjectMapper objectMapper, FileProcessor fileProcessor) {
-    super(objectMapper, fileProcessor);
-  }
+    public GetTopicsMessageHandler(ObjectMapper objectMapper, FileProcessor fileProcessor) {
+        super(objectMapper, fileProcessor);
+    }
 
-  @Override
-  public String performOperation(JsonNode jsonMessage) throws JsonProcessingException {
-    return objectMapper.writeValueAsString(fileProcessor.listTopics());
-  }
+    @Override
+    public String performOperation(JsonNode jsonMessage) throws JsonProcessingException {
+        return objectMapper.writeValueAsString(fileProcessor.listTopics());
+    }
 }

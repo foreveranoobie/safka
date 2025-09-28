@@ -5,6 +5,7 @@ head
     meta(charset="UTF-8")
     meta(name="viewport" content="width=device-width, initial-scale=1.0")
     link(rel="stylesheet" href="/style.css")
+    script(type= 'text/javascript',src="/scripts.js")
     title Messages Page
     style.
         #send-msg {
@@ -48,7 +49,10 @@ head
             margin-top: 10px;
         }
 
+include includes/header.pug
+
 body
+    include includes/user-info.pug
     <div class="page-body">
         <div class="menu" style="height:200px">
             <button onclick="window.location.href='/'">Topics</button>

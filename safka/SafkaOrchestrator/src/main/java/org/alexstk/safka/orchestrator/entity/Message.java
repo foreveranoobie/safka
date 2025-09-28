@@ -17,4 +17,5 @@ public class Message implements Serializable {
   private String content;
   private long timestamp;
   private String key;
+  private String idToken;
 }
