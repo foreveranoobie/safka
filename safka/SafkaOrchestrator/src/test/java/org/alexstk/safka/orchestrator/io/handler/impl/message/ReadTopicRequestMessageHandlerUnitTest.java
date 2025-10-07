@@ -5,6 +5,7 @@ import static org.mockito.Mockito.when;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.storozhuk.decoder.UserInfo;
 import java.util.List;
 import org.alexstk.safka.orchestrator.entity.ResponseMessage;
 import org.alexstk.safka.orchestrator.entity.dto.TcpRequestDto;
@@ -36,7 +37,9 @@ public class ReadTopicRequestMessageHandlerUnitTest {
         throws JsonProcessingException {
         //given
         String topicName = "topicName";
-        TcpRequestDto givenRequestDto = new TcpRequestDto(null, topicName, null, null, null, null);
+        UserInfo userInfo = new UserInfo(null, List.of(topicName), null, null, null);
+        TcpRequestDto givenRequestDto = new TcpRequestDto(null, topicName, null, null, userInfo,
+            null);
         ResponseMessage topicResponseMessage = new ResponseMessage("message",
             System.currentTimeMillis(), "123");
         String expectedMessages = objectMapper.valueToTree(List.of(topicResponseMessage))
@@ -49,5 +52,23 @@ public class ReadTopicRequestMessageHandlerUnitTest {
 
         //then
         Assertions.assertThat(actualMessages).isEqualTo(expectedMessages);
+    }
+
+    @Test
+    public void shouldReturnError_whenPerformOperation_givenTopicNameAbsentInRoles()
+        throws JsonProcessingException {
+        //given
+        String topicName = "topicName";
+        TcpRequestDto givenRequestDto = new TcpRequestDto(null, topicName, null, null,
+            new UserInfo(null, null, null, null, null),
+            null);
+        String expectedMessage = objectMapper.writeValueAsString(
+            new ResponseMessage("ERROR_UNAUTHORIZED", 0L, null));
+
+        //when
+        String actualMessage = handler.performOperation(givenRequestDto);
+
+        //then
+        Assertions.assertThat(actualMessage).isEqualTo(expectedMessage);
     }
 }

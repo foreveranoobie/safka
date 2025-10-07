@@ -16,8 +16,13 @@ public class ReadTopicMessageHandler extends AbstractResponseMessageHandler {
 
     @Override
     public String performOperation(TcpRequestDto requestDto) throws JsonProcessingException {
-        List<ResponseMessage> requestMessages = fileProcessor.getMessagesFromTopic(
-            requestDto.getTopicName());
-        return objectMapper.writeValueAsString(requestMessages);
+        String topicName = requestDto.getTopicName();
+        if (requestDto.getUserInfo().roles() != null && requestDto.getUserInfo().roles()
+            .contains(topicName)) {
+            List<ResponseMessage> requestMessages = fileProcessor.getMessagesFromTopic(
+                requestDto.getTopicName());
+            return objectMapper.writeValueAsString(requestMessages);
+        }
+        return objectMapper.writeValueAsString(new ResponseMessage("ERROR_UNAUTHORIZED", 0L, null));
     }
 }

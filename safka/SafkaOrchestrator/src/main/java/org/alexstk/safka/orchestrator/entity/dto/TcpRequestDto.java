@@ -12,6 +12,7 @@ import org.alexstk.safka.orchestrator.entity.AccessToken;
 @Getter
 @Setter
 @AllArgsConstructor
+@NoArgsConstructor
 @ToString
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class TcpRequestDto {
