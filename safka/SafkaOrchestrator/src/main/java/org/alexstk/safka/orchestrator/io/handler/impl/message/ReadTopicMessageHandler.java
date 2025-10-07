@@ -4,7 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
-import org.alexstk.safka.orchestrator.entity.Message;
+import org.alexstk.safka.orchestrator.entity.ResponseMessage;
+import org.alexstk.safka.orchestrator.entity.dto.TcpRequestDto;
 import org.alexstk.safka.orchestrator.file.FileProcessor;
 
 public class ReadTopicMessageHandler extends AbstractResponseMessageHandler {
@@ -14,9 +15,9 @@ public class ReadTopicMessageHandler extends AbstractResponseMessageHandler {
     }
 
     @Override
-    public String performOperation(JsonNode jsonMessage) throws JsonProcessingException {
-        String topicName = jsonMessage.get("topicName").asText();
-        List<Message> messages = fileProcessor.getMessagesFromTopic(topicName);
-        return objectMapper.writeValueAsString(messages);
+    public String performOperation(TcpRequestDto requestDto) throws JsonProcessingException {
+        List<ResponseMessage> requestMessages = fileProcessor.getMessagesFromTopic(
+            requestDto.getTopicName());
+        return objectMapper.writeValueAsString(requestMessages);
     }
 }

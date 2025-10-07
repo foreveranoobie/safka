@@ -2,6 +2,7 @@ package org.alexstk.safka.orchestrator.io.handler.impl.sink;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import java.io.IOException;
+import org.alexstk.safka.orchestrator.entity.dto.TcpRequestDto;
 import org.alexstk.safka.orchestrator.file.FileProcessor;
 
 public class CreateTopicMessageHandler extends AbstractSinkMessageHandler {
@@ -11,8 +12,7 @@ public class CreateTopicMessageHandler extends AbstractSinkMessageHandler {
     }
 
     @Override
-    public void performOperation(JsonNode jsonMessage) throws Exception {
-        String topicName = jsonMessage.get("topicName").asText();
-        fileProcessor.createFolderForTopic(topicName);
+    public void performOperation(TcpRequestDto requestDto) throws Exception {
+        fileProcessor.createFolderForTopic(requestDto.getTopicName());
     }
 }

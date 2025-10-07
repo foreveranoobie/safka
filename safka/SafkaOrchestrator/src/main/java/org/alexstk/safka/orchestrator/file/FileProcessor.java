@@ -14,7 +14,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.alexstk.safka.orchestrator.entity.Message;
+import org.alexstk.safka.orchestrator.entity.request.RequestMessage;
+import org.alexstk.safka.orchestrator.entity.ResponseMessage;
 
 public class FileProcessor {
 
@@ -37,17 +38,17 @@ public class FileProcessor {
         }
     }
 
-    public void writeMessageToTopic(String topicName, Message message) throws IOException {
+    public void writeMessageToTopic(String topicName, RequestMessage requestMessage) throws IOException {
         if (topicExists(topicName)) {
             String pathTxt = String.format("%s.txt",
                 getPathSeparatedWithArguments(getTopicPathWithFileSeparator(topicName),
-                    String.format("%s-%s", message.getKey(), message.getTimestamp())));
+                    String.format("%s-%s", requestMessage.getKey(), requestMessage.getTimestamp())));
             System.err.printf("Writing message: %s\n", pathTxt);
             FileOutputStream fileOutputStream
                 = new FileOutputStream(pathTxt);
             try (ObjectOutputStream objectOutputStream
                 = new ObjectOutputStream(fileOutputStream)) {
-                objectOutputStream.writeObject(message);
+                objectOutputStream.writeObject(requestMessage);
                 objectOutputStream.flush();
             }
         }
@@ -71,7 +72,7 @@ public class FileProcessor {
             .collect(Collectors.toList());
     }
 
-    public List<Message> getMessagesFromTopic(String topicName) {
+    public List<ResponseMessage> getMessagesFromTopic(String topicName) {
         if (topicExists(topicName)) {
             return Arrays.stream(new File(getTopicPathWithFileSeparator(topicName)).listFiles())
                 .map(file -> {
@@ -82,16 +83,16 @@ public class FileProcessor {
                     }
                 }).collect(Collectors.toList());
         } else {
-            return List.of(new Message("Topic not found", 404, null, null));
+            return List.of(new ResponseMessage("Topic not found", 404, null));
         }
     }
 
-    private Message getMessageFromFile(File file) throws IOException, ClassNotFoundException {
+    private ResponseMessage getMessageFromFile(File file) throws IOException, ClassNotFoundException {
         FileInputStream fileInputStream
             = new FileInputStream(file);
         try (ObjectInputStream objectInputStream
             = new ObjectInputStream(fileInputStream)) {
-            Message msg = (Message) objectInputStream.readObject();
+            ResponseMessage msg = (ResponseMessage) objectInputStream.readObject();
             objectInputStream.close();
             return msg;
         }

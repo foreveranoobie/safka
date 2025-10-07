@@ -1,8 +1,8 @@
 package org.alexstk.safka.orchestrator.io.handler.impl.sink;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import java.io.IOException;
-import org.alexstk.safka.orchestrator.entity.Message;
+import org.alexstk.safka.orchestrator.entity.dto.TcpRequestDto;
+import org.alexstk.safka.orchestrator.entity.request.RequestMessage;
 import org.alexstk.safka.orchestrator.file.FileProcessor;
 
 public class PublishMessageHandler extends AbstractSinkMessageHandler {
@@ -12,11 +12,9 @@ public class PublishMessageHandler extends AbstractSinkMessageHandler {
     }
 
     @Override
-    public void performOperation(JsonNode jsonMessage) throws Exception {
-        String topicName = jsonMessage.get("topicName").asText(); // Get topic name from JSON
-        String contents = jsonMessage.get("contents").asText();
-        String key = jsonMessage.get("key").asText();
-        fileProcessor.writeMessageToTopic(topicName,
-            new Message(contents, System.currentTimeMillis(), key, null));
+    public void performOperation(TcpRequestDto requestDto) throws Exception {
+        fileProcessor.writeMessageToTopic(requestDto.getTopicName(),
+            new RequestMessage(requestDto.getContents(), System.currentTimeMillis(),
+                requestDto.getKey(), null));
     }
 }

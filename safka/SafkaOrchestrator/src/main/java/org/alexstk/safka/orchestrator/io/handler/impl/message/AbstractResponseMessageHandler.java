@@ -4,9 +4,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.netty.channel.ChannelHandlerContext;
-import java.io.IOException;
 import lombok.AllArgsConstructor;
-import org.alexstk.safka.orchestrator.entity.Message;
+import org.alexstk.safka.orchestrator.entity.ResponseMessage;
+import org.alexstk.safka.orchestrator.entity.dto.TcpRequestDto;
 import org.alexstk.safka.orchestrator.file.FileProcessor;
 import org.alexstk.safka.orchestrator.io.handler.MessageHandler;
 
@@ -17,16 +17,16 @@ public abstract class AbstractResponseMessageHandler implements MessageHandler {
     FileProcessor fileProcessor;
 
     @Override
-    public void readMessage(ChannelHandlerContext ctx, JsonNode jsonMessage) {
+    public void readMessage(ChannelHandlerContext ctx, TcpRequestDto requestDto) {
         try {
-            performOperation(jsonMessage);
-            String response = performOperation(jsonMessage);
+            performOperation(requestDto);
+            String response = performOperation(requestDto);
             ctx.writeAndFlush(response);
             ctx.disconnect();
         } catch (Exception e) {
             System.err.println(e.getMessage());
             try {
-                String response = objectMapper.writeValueAsString(new Message("ERROR", 0L, null, null));
+                String response = objectMapper.writeValueAsString(new ResponseMessage("ERROR", 0L, null));
                 ctx.writeAndFlush(response);
             } catch (JsonProcessingException ex) {
                 throw new RuntimeException(ex);
@@ -36,5 +36,5 @@ public abstract class AbstractResponseMessageHandler implements MessageHandler {
         }
     }
 
-    public abstract String performOperation(JsonNode jsonMessage) throws JsonProcessingException;
+    public abstract String performOperation(TcpRequestDto requestDto) throws JsonProcessingException;
 }

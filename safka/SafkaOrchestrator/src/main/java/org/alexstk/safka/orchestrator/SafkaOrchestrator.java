@@ -1,6 +1,7 @@
 package org.alexstk.safka.orchestrator;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.storozhuk.decoder.AuthService;
 import org.alexstk.safka.orchestrator.file.FileProcessor;
 import org.alexstk.safka.orchestrator.io.handler.impl.message.GetTopicsMessageHandler;
 import org.alexstk.safka.orchestrator.io.handler.impl.message.ReadTopicMessageHandler;
@@ -14,23 +15,27 @@ public class SafkaOrchestrator {
         String topic = getTopicsDir(args);
         FileProcessor fileProcessor = new FileProcessor(topic);
         ObjectMapper objectMapper = new ObjectMapper();
-        MessageOrchestrator orchestrator = getMessageOrchestrator(objectMapper, fileProcessor, port);
+        AuthService authService = new AuthService(System.getenv("ISSUER_BASE_URL"));
+        MessageOrchestrator orchestrator = getMessageOrchestrator(objectMapper, fileProcessor, port,
+            authService);
         orchestrator.startListening();
     }
 
-    private static MessageOrchestrator getMessageOrchestrator(ObjectMapper objectMapper, FileProcessor fileProcessor, int port) {
+    private static MessageOrchestrator getMessageOrchestrator(ObjectMapper objectMapper,
+        FileProcessor fileProcessor, int port,
+        AuthService authService) {
         GetTopicsMessageHandler getTopicsMessageHandler = new GetTopicsMessageHandler(objectMapper,
-                fileProcessor);
+            fileProcessor);
         ReadTopicMessageHandler readTopicMessageHandler = new ReadTopicMessageHandler(objectMapper,
-                fileProcessor);
+            fileProcessor);
         PublishMessageHandler publishMessageHandler = new PublishMessageHandler(fileProcessor);
         CreateTopicMessageHandler createTopicMessageHandler = new CreateTopicMessageHandler(
-                fileProcessor);
+            fileProcessor);
         return new MessageOrchestrator(port, getTopicsMessageHandler,
-                readTopicMessageHandler, publishMessageHandler, createTopicMessageHandler);
+            readTopicMessageHandler, publishMessageHandler, createTopicMessageHandler, authService);
     }
 
-    private static int getPort(String[] args){
+    private static int getPort(String[] args) {
         if (args == null || args.length == 0 || !args[0].matches("[0-9]+")) {
             System.out.println("Port is not provided. Using default 7500 instead");
             return 7500;
@@ -41,7 +46,7 @@ public class SafkaOrchestrator {
         }
     }
 
-    private static String getTopicsDir(String[] args){
+    private static String getTopicsDir(String[] args) {
         if (args == null || args.length < 2) {
             System.out.println("Topics path is not provided. Using default 'topics' instead");
             return "topics";

@@ -1,6 +1,7 @@
 package org.alexstk.safka.orchestrator;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.storozhuk.decoder.AuthService;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelOption;
@@ -41,11 +42,11 @@ public class MessageOrchestrator {
 
   public MessageOrchestrator(int tcpPort, GetTopicsMessageHandler getTopicsMessageHandler,
       ReadTopicMessageHandler readTopicMessageHandler, PublishMessageHandler publishMessageHandler,
-      CreateTopicMessageHandler createTopicMessageHandler) {
+      CreateTopicMessageHandler createTopicMessageHandler, AuthService authService) {
     this.tcpPort = tcpPort;
     handlerChannelInitializer = new HandlerChannelInitializer(
         new MessageInboundHandlerAdapter(getTopicsMessageHandler, readTopicMessageHandler,
-            publishMessageHandler, createTopicMessageHandler));
+            publishMessageHandler, createTopicMessageHandler, authService));
   }
 
   public boolean createTopic(String topicName) {

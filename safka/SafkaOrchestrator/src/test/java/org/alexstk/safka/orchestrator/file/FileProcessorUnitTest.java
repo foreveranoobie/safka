@@ -4,7 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import org.alexstk.safka.orchestrator.entity.Message;
+import org.alexstk.safka.orchestrator.entity.request.RequestMessage;
+import org.alexstk.safka.orchestrator.entity.ResponseMessage;
 import org.alexstk.safka.orchestrator.io.handler.impl.utils.TestUtils;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
@@ -85,34 +86,35 @@ public class FileProcessorUnitTest {
   public void shouldWriteMessageToTheTopic_whenWriteMessageToTopic_givenMessageAndTopicName()
       throws IOException {
     //given
-    Message givenMessage = new Message("Test", System.currentTimeMillis(), "123");
+    RequestMessage givenRequestMessage = new RequestMessage("Test", System.currentTimeMillis(), "123", null);
+    ResponseMessage expectedResponseMessage = new ResponseMessage("Test", System.currentTimeMillis(), "123");
     String givenTopicName = "test-topic";
     fileProcessor.createFolderForTopic(givenTopicName);
 
     //when
-    fileProcessor.writeMessageToTopic(givenTopicName, givenMessage);
+    fileProcessor.writeMessageToTopic(givenTopicName, givenRequestMessage);
 
     //then
-    List<Message> actualMessages = fileProcessor.getMessagesFromTopic(givenTopicName);
-    Assertions.assertThat(actualMessages).usingRecursiveFieldByFieldElementComparator()
-        .containsExactlyInAnyOrder(givenMessage);
+    List<ResponseMessage> actualRequestMessages = fileProcessor.getMessagesFromTopic(givenTopicName);
+    Assertions.assertThat(actualRequestMessages).usingRecursiveFieldByFieldElementComparator()
+        .containsExactlyInAnyOrder(expectedResponseMessage);
   }
 
   @Test
   public void shouldNotWriteMessageToTheTopic_whenWriteMessageToTopic_givenMessageAndAbsentTopicName()
       throws IOException {
     //given
-    Message givenMessage = new Message("Test", System.currentTimeMillis(), "123");
+    RequestMessage givenRequestMessage = new RequestMessage("Test", System.currentTimeMillis(), "123", null);
     String givenTopicName = "test-topic";
 
-    Message expectedMessage = new Message("Topic not found", 404, null);
+    ResponseMessage expectedResponseMessage = new ResponseMessage("Topic not found", 404, "123");
 
     //when
-    fileProcessor.writeMessageToTopic(givenTopicName, givenMessage);
+    fileProcessor.writeMessageToTopic(givenTopicName, givenRequestMessage);
 
     //then
-    List<Message> actualMessages = fileProcessor.getMessagesFromTopic(givenTopicName);
-    Assertions.assertThat(actualMessages).usingRecursiveFieldByFieldElementComparator()
-        .containsExactlyInAnyOrder(expectedMessage);
+    List<ResponseMessage> actualRequestMessages = fileProcessor.getMessagesFromTopic(givenTopicName);
+    Assertions.assertThat(actualRequestMessages).usingRecursiveFieldByFieldElementComparator()
+        .containsExactlyInAnyOrder(expectedResponseMessage);
   }
 }

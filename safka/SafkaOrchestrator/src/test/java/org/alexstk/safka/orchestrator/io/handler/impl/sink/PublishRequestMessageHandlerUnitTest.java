@@ -5,8 +5,8 @@ import static org.mockito.ArgumentMatchers.refEq;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.IOException;
-import org.alexstk.safka.orchestrator.entity.Message;
+import org.alexstk.safka.orchestrator.entity.dto.TcpRequestDto;
+import org.alexstk.safka.orchestrator.entity.request.RequestMessage;
 import org.alexstk.safka.orchestrator.file.FileProcessor;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,7 +16,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-public class PublishMessageHandlerUnitTest {
+public class PublishRequestMessageHandlerUnitTest {
 
   @Mock
   private FileProcessor fileProcessor;
@@ -24,26 +24,22 @@ public class PublishMessageHandlerUnitTest {
   @InjectMocks
   private PublishMessageHandler handler;
 
-  private final ObjectMapper objectMapper = new ObjectMapper();
-
   @Test
   public void shouldPublishMessage_whenPerformOperation_givenMessage() throws Exception {
     //given
     String topicName = "topicName";
     String key = "123";
     String contents = "contents";
+    TcpRequestDto requestDto = new TcpRequestDto(null, topicName, contents, key, null, null);
 
-    JsonNode givenMessage = objectMapper.createObjectNode().put("topicName", topicName)
-        .put("key", key).put("contents", contents);
-
-    Message expectedMessage = new Message(contents, System.currentTimeMillis(), key);
+    RequestMessage expectedRequestMessage = new RequestMessage(contents, System.currentTimeMillis(), key, null);
 
     //when
-    handler.performOperation(givenMessage);
+    handler.performOperation(requestDto);
 
     //then
     Mockito.verify(fileProcessor)
-        .writeMessageToTopic(eq(topicName), refEq(expectedMessage, "timestamp"));
+        .writeMessageToTopic(eq(topicName), refEq(expectedRequestMessage, "timestamp"));
 
   }
 }
