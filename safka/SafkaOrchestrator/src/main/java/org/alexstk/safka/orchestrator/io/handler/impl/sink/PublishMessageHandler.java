@@ -1,5 +1,7 @@
 package org.alexstk.safka.orchestrator.io.handler.impl.sink;
 
+import static org.alexstk.safka.orchestrator.io.handler.MessageHandlerHelper.isAdmin;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import java.util.List;
 import org.alexstk.safka.orchestrator.entity.ResponseMessage;
@@ -17,7 +19,7 @@ public class PublishMessageHandler extends AbstractSinkMessageHandler {
     public void performOperation(TcpRequestDto requestDto) throws Exception {
         String topicName = requestDto.getTopicName();
         List<String> roles = requestDto.getUserInfo().roles();
-        if(roles != null && roles.contains(topicName)) {
+        if (isAdmin(requestDto.getUserInfo()) || (roles != null && roles.contains(topicName))) {
             fileProcessor.writeMessageToTopic(requestDto.getTopicName(),
                 new RequestMessage(requestDto.getContents(), System.currentTimeMillis(),
                     requestDto.getKey(), null));

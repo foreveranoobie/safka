@@ -103,6 +103,7 @@ body {
     border: 0;
     transition: 500ms ease;
     width: 150px;
+    height: 50px;
 }
 
 .menu > .active-btn {
@@ -202,7 +203,7 @@ header {
     height: 50px;
     display: flex;
     align-items: center;
-    gap: 30px;
+    gap: 20px;
 }
 
 #user-info {
@@ -217,7 +218,7 @@ header {
     display: none;
 }
 
-#logout {
+#login-out {
     padding: 5px 10px;
     border: 2px solid rgb(255, 232, 205);
     border-radius: 5px;
@@ -227,9 +228,10 @@ header {
     text-transform: uppercase;
     font-family: 'Trebuchet MS', sans-serif;
     transition: 300ms ease;
+    margin-left: 15px;
 }
 
-#logout:hover {
+#login-out:hover {
     background-color: rgba(24, 26, 66, 1);
     transition: 300ms ease;
 }

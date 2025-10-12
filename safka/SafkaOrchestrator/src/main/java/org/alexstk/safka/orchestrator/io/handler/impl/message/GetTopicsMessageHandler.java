@@ -1,5 +1,7 @@
 package org.alexstk.safka.orchestrator.io.handler.impl.message;
 
+import static org.alexstk.safka.orchestrator.io.handler.MessageHandlerHelper.isAdmin;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -17,6 +19,9 @@ public class GetTopicsMessageHandler extends AbstractResponseMessageHandler {
     @Override
     public String performOperation(TcpRequestDto requestDto) throws JsonProcessingException {
         List<String> existingTopics = fileProcessor.listTopics();
+        if (isAdmin(requestDto.getUserInfo())) {
+            return objectMapper.writeValueAsString(existingTopics);
+        }
         List<String> roles = requestDto.getUserInfo().roles();
         if (roles != null) {
             List<String> authorizedTopics = existingTopics.stream().filter(roles::contains)

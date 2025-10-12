@@ -14,13 +14,11 @@ import org.alexstk.safka.orchestrator.io.handler.MessageHandler;
 public class MessageHandlerAuthProxy implements MessageHandler {
 
     private MessageHandler delegate;
-    private ObjectMapper objectMapper;
     private AuthService authService;
 
     public MessageHandlerAuthProxy(MessageHandler delegate, AuthService authService) {
         this.delegate = delegate;
         this.authService = authService;
-        objectMapper = new ObjectMapper();
     }
 
     @Override

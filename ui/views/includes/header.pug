@@ -1,3 +1,6 @@
 header
-    <img id="profile-img" onclick="openUserDetails();" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTqmA_K0xJxXq6VQFwJBXUmtFAvvoJJBmxYZg&s" style="margin-left:10px; height:40px; width:40px; border-radius:50%">
-    <a id="logout" href="/logout">Logout</a>
+    if user
+        <img id="profile-img" onclick="openUserDetails();" src="#{user.picture}" style="margin-left:10px; height:40px; width:40px; border-radius:50%">
+        <a id="login-out" href="/logout">Logout</a>
+    else
+        <a id="login-out" href="/login">Login</a>

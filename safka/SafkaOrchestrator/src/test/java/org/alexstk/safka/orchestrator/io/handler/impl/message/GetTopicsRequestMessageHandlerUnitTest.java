@@ -31,7 +31,8 @@ public class GetTopicsRequestMessageHandlerUnitTest {
     }
 
     @Test
-    public void shouldReturnListOfAuthorizedTopics_whenPerformOperation_givenUserWithTopicRoles() throws JsonProcessingException {
+    public void shouldReturnListOfAuthorizedTopics_whenPerformOperation_givenUserWithTopicRoles()
+        throws JsonProcessingException {
         //given
         String firstTopic = "topic1";
         String secondTopic = "topic2";
@@ -41,6 +42,27 @@ public class GetTopicsRequestMessageHandlerUnitTest {
         TcpRequestDto requestDto = new TcpRequestDto(null, null, null, null, userInfo, null);
 
         String expectedResponse = objectMapper.valueToTree(List.of(secondTopic)).toString();
+
+        //when
+        String actualResponse = handler.performOperation(requestDto);
+
+        //then
+        Assertions.assertThat(actualResponse).isEqualTo(expectedResponse);
+    }
+
+    @Test
+    public void shouldReturnAllTopics_whenPerformOperation_givenUserWithAdminPermissions()
+        throws JsonProcessingException {
+        //given
+        String firstTopic = "topic1";
+        String secondTopic = "topic2";
+        when(fileProcessor.listTopics()).thenReturn(List.of(firstTopic, secondTopic));
+
+        UserInfo userInfo = new UserInfo(null, null, List.of("ADMIN"), null, null);
+        TcpRequestDto requestDto = new TcpRequestDto(null, null, null, null, userInfo, null);
+
+        String expectedResponse = objectMapper.valueToTree(List.of(firstTopic, secondTopic))
+            .toString();
 
         //when
         String actualResponse = handler.performOperation(requestDto);

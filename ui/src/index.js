@@ -7,6 +7,7 @@ const PropertiesReader = require('properties-reader')
 const props = PropertiesReader('src/resources/application.properties')
 const { auth } = require('express-openid-connect')
 const path = require('path')
+const { attachUserToLocals } = require('./auth')
 
 const app = express()
 app.use(bodyParser.json())
@@ -36,28 +37,28 @@ app.use(
     authorizationParams: {
       response_type: 'code', // This requires you to provide a client secret
       audience: process.env.AUDIENCE,
-      scope: 'openid profile email'
+      scope: 'openid profile email read:user_metadata write:user_metadata'
     },
     afterCallback: (req, res, session) => {
       // Access user profile here
       console.log(JSON.stringify(req.oidc.accessToken))
       console.log(JSON.stringify(req.oidc.user))
       console.log('Access Token:', session.access_token)
-      console.log('ID Token:', session.id_token)
-
+      
       if (session.id_token) {
         const jwt = require('jsonwebtoken')
         const userClaims = jwt.decode(session.id_token)
         session.userClaims = userClaims
         console.log('User claims:', userClaims)
       }
-
       return session
     }
   })
 )
 
-app.get('/', async (req, res, session) => {
+app.use(attachUserToLocals)
+
+app.get('/', async (req, res) => {
   let response
   try {
     response = await runClient(

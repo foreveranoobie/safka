@@ -83,12 +83,13 @@ include includes/header.pug
 body
     include includes/user-info.pug
     <div class="page-body">
-        <div class="menu" style="height:250px">
+        <div class="menu">
             <button class="active-btn">Topics</button>
             <button>Brokers</button>
             <button>Consumers</button>
             <button onclick="openSendMsg();">Send message</button>
-            <button onclick="openCreateTopic();">Create topic</button>
+            if user.permissions != null && user.permissions.includes('ADMIN')
+                <button onclick="openCreateTopic();">Create topic</button>
         </div>
         <div class="content-table">
             <div id="t-head">

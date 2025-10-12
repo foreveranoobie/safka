@@ -4,6 +4,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.refEq;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -45,12 +46,34 @@ public class PublishRequestMessageHandlerUnitTest {
         handler.performOperation(requestDto);
 
         //then
-        Mockito.verify(fileProcessor)
+        verify(fileProcessor)
             .writeMessageToTopic(eq(topicName), refEq(expectedRequestMessage, "timestamp"));
     }
 
     @Test
-    public void shouldNotPublishMessage_whenPerformOperation_givenTopicNameNotPresentInRoles()
+    public void shouldPublishMessage_whenPerformOperation_givenMessageAndAdminPermissions()
+        throws Exception {
+        //given
+        String topicName = "topicName";
+        String key = "123";
+        String contents = "contents";
+        UserInfo userInfo = new UserInfo(null, null, List.of("ADMIN"), null, null);
+        TcpRequestDto requestDto = new TcpRequestDto(null, topicName, contents, key, userInfo,
+            null);
+
+        RequestMessage expectedRequestMessage = new RequestMessage(contents,
+            System.currentTimeMillis(), key, null);
+
+        //when
+        handler.performOperation(requestDto);
+
+        //then
+        verify(fileProcessor)
+            .writeMessageToTopic(eq(topicName), refEq(expectedRequestMessage, "timestamp"));
+    }
+
+    @Test
+    public void shouldNotPublishMessage_whenPerformOperation_givenTopicNameNotPresentInRolesAndNoAdminPermissions()
         throws Exception {
         //given
         String topicName = "topicName";
@@ -67,7 +90,7 @@ public class PublishRequestMessageHandlerUnitTest {
         handler.performOperation(requestDto);
 
         //then
-        Mockito.verify(fileProcessor, never())
+        verify(fileProcessor, never())
             .writeMessageToTopic(any(), any());
     }
 }
