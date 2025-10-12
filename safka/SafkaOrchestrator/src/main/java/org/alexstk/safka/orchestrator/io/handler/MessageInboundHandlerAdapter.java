@@ -1,6 +1,5 @@
 package org.alexstk.safka.orchestrator.io.handler;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.storozhuk.decoder.AuthService;
 import io.netty.channel.ChannelHandler;

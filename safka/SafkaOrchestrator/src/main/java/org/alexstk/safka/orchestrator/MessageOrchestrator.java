@@ -34,7 +34,6 @@ public class MessageOrchestrator {
   private final ExecutorService executorService = Executors.newFixedThreadPool(
       1); // Adjust thread pool size as needed
   private final int tcpPort;
-  private final ObjectMapper objectMapper = new ObjectMapper();
   private final HandlerChannelInitializer handlerChannelInitializer;
   IoEventLoopGroup bossGroup;
   EventLoopGroup workerGroup;
